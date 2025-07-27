@@ -1,0 +1,48 @@
+#jinja2: trim_blocks: "true", lstrip_blocks: "true"
+{{ ansible_managed | comment() }}
+
+services:
+  sonarr:
+    image: {{ sonarr_docker_image }}
+    container_name: {{ sonarr_docker_container_name }}
+    restart: {{ sonarr_docker_restart_policy }}
+    {% if sonarr_docker_ports | length > 0 %}
+    ports:
+      {% for port in sonarr_docker_ports %}
+      - {{ port }}
+      {% endfor %}
+    {% endif %}
+    {% if sonarr_docker_networks | length > 0 %}
+    networks:
+      {% for net in sonarr_docker_networks %}
+      - {{ net }}
+      {% endfor %}
+    {% endif %}
+    volumes:
+      {% for vol in sonarr_docker_volumes %}
+      - {{ vol }}
+      {% endfor %}
+    environment:
+      {% for key, value in sonarr_docker_environment.items() %}
+      {{ key }}: "{{ value }}"
+      {% endfor %}
+    {% if sonarr_docker_depends_on %}
+    depends_on:
+      {% for dep in sonarr_docker_depends_on %}
+      - {{ dep }}
+      {% endfor %}
+    {% endif %}
+    {% if sonarr_docker_labels %}
+    labels:
+      {% for label in sonarr_docker_labels %}
+      - {{ label }}
+      {% endfor %}
+    {% endif %}
+{% if sonarr_docker_networks | length > 0 %}
+
+networks:
+  {% for net in sonarr_docker_networks %}
+  {{ net }}:
+    external: true
+  {% endfor %}
+{% endif %}

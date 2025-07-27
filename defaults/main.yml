@@ -1,0 +1,54 @@
+---
+
+# Environment variables for Sonarr
+# See https://docs.linuxserver.io/images/docker-sonarr/
+sonarr_docker_environment:
+  PUID: '1000'
+  PGID: '1000'
+  TZ: 'Etc/UTC'
+
+# Volume mappings
+ssonarr_docker_volumes:
+  - "{{ sonarr_docker_base_dir }}/config:/config"
+  # The default way
+  - '/path/to/tv-series:/tv'
+  - '/path/to/download-client-downloads:/downloads'
+  # Better, for atomic moves/hard links
+  # See https://wiki.servarr.com/docker-guide#consistent-and-well-planned-paths
+  # See https://trash-guides.info/File-and-Folder-Structure/Hardlinks-and-Instant-Moves/
+  # - /path/to/data:/data
+
+# Networks to attach the container to
+sonarr_docker_networks: []
+# Example:
+# sonarr_docker_networks:
+#  - "mediarr"
+
+# Optional depends on
+sonarr_docker_depends_on: []
+
+# The ports to pass through, can be an empty list if you don't need to expose ports
+sonarr_docker_ports:
+  - '8989:8989'
+
+# User that will run Sonarr
+sonarr_docker_user: "{{ ansible_user }}"
+
+# Base path for deployment
+sonarr_docker_base_dir: '/srv/sonarr_docker'
+
+# Docker image
+sonarr_docker_image: 'lscr.io/linuxserver/sonarr:latest'
+
+# Docker container name
+sonarr_docker_container_name: 'sonarr'
+
+# Define our restart policy
+sonarr_docker_restart_policy: 'unless-stopped'
+
+# Define labels for the Sonarr container
+sonarr_docker_labels: []
+# Example:
+#sonarr_docker_labels:
+#  - traefik.enable=true
+#  - traefik.http.routers.traefik-https.entrypoints=https

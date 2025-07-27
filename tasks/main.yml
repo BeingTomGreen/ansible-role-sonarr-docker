@@ -1,0 +1,22 @@
+---
+
+- name: Ensure base Sonarr directory exists
+  ansible.builtin.file:
+    path: "{{ sonarr_docker_base_dir }}"
+    state: 'directory'
+    owner: "{{ sonarr_docker_user }}"
+    group: "{{ sonarr_docker_user }}"
+    mode: '0755'
+
+- name: Ensure Sonarr compose file is present
+  ansible.builtin.template:
+    src: 'compose.yml.j2'
+    dest: "{{ sonarr_docker_base_dir }}/compose.yml"
+    owner: "{{ sonarr_docker_user }}"
+    group: "{{ sonarr_docker_user }}"
+    mode: '0644'
+
+- name: Ensure Sonarr is running
+  community.docker.docker_compose_v2:
+    project_src: "{{ sonarr_docker_base_dir }}"
+    state: 'present'
