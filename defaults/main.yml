@@ -49,6 +49,6 @@ sonarr_docker_restart_policy: 'unless-stopped'
 # Define labels for the Sonarr container
 sonarr_docker_labels: []
 # Example:
-#sonarr_docker_labels:
+# sonarr_docker_labels:
 #  - traefik.enable=true
 #  - traefik.http.routers.traefik-https.entrypoints=https
