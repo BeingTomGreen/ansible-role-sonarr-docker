@@ -31,9 +31,9 @@ Now you're free to use it within your project:
   become: true
   vars:
     sonarr_docker_environment:
-      PUID: "6900"
-      PGID: "6900"
-      TZ: "Europe/London"
+      PUID: '6900'
+      PGID: '6900'
+      TZ: 'Europe/London'
 
     sonarr_docker_volumes:
       - "{{ sonarr_docker_base_dir }}/config:/config"
