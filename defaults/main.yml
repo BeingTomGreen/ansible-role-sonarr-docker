@@ -1,54 +1,92 @@
 ---
 
-# Environment variables for Sonarr
-# See https://docs.linuxserver.io/images/docker-sonarr/
-sonarr_docker_environment:
-  PUID: '1000'
-  PGID: '1000'
-  TZ: 'Etc/UTC'
+# Specifies container capabilities to add/drop
+# See: https://man7.org/linux/man-pages/man7/capabilities.7.html
+sonarr_docker_cap_add: []
+sonarr_docker_cap_drop: []
 
-# Volume mappings
-ssonarr_docker_volumes:
-  - "{{ sonarr_docker_base_dir }}/config:/config"
-  # The default way
-  - '/path/to/tv-series:/tv'
-  - '/path/to/download-client-downloads:/downloads'
-  # Better, for atomic moves/hard links
-  # See https://wiki.servarr.com/docker-guide#consistent-and-well-planned-paths
-  # See https://trash-guides.info/File-and-Folder-Structure/Hardlinks-and-Instant-Moves/
-  # - '/path/to/data:/data'
-
-# Networks to attach the container to
-sonarr_docker_networks: []
-# Example:
-# sonarr_docker_networks:
-#  - 'mediarr'
-
-# Optional depends on
-sonarr_docker_depends_on: []
-
-# The ports to pass through, can be an empty list if you don't need to expose ports
-sonarr_docker_ports:
-  - '8989:8989'
-
-# User that will run Sonarr
-sonarr_docker_user: "{{ ansible_user }}"
-
-# Base path for deployment
-sonarr_docker_base_dir: '/srv/sonarr_docker'
-
-# Docker image
-sonarr_docker_image: 'lscr.io/linuxserver/sonarr:latest'
-
-# Docker container name
+# Set container name
 sonarr_docker_container_name: 'sonarr'
 
-# Define our restart policy
-sonarr_docker_restart_policy: 'unless-stopped'
+# Set services container depends on
+sonarr_docker_depends_on: []
 
-# Define labels for the Sonarr container
+# Set container devices
+# See: https://docs.linuxserver.io/images/docker-sonarr/#hardware-acceleration
+sonarr_docker_devices: []
+# Example:
+# sonarr_docker_devices:
+# - '/dev/dri:/dev/dri'
+# - '/dev/kfd:/dev/kfd'
+
+# Set container PUID and PGID
+# See https://docs.linuxserver.io/general/understanding-puid-and-pgid/
+sonarr_docker_env_puid: 1000
+sonarr_docker_env_pgid: 1000
+
+# Set container timezone env
+sonarr_docker_env_timezone: 'Etc/UTC'
+
+# Set additional Sonarr envs
+# Additional container environment variables
+sonarr_docker_extra_environment_vars: []
+# Example:
+# sonarr_docker_extra_environment_vars:
+#   SOME_OTHER_VAR: 'A_VALUE'
+
+# Set container image options
+sonarr_docker_image: 'lscr.io/linuxserver/sonarr'
+sonarr_docker_image_tag: 'latest'
+
+# Set container labels
 sonarr_docker_labels: []
 # Example:
 # sonarr_docker_labels:
-#  - traefik.enable=true
-#  - traefik.http.routers.traefik-https.entrypoints=https
+#  traefik.enable: 'true'
+#  traefik.http.routers.traefik-https.entrypoints: 'https'
+
+# Set container network mode
+# Can be: null (if using port mapping/networks) 'none', 'host', 'service:<service-name>' or 'container:<container-name>'
+# sonarr_docker_network_mode will need to be null if you want to specify ports etc
+sonarr_docker_network_mode:
+
+# Set container external networks
+sonarr_docker_external_networks: []
+# Example:
+# sonarr_docker_external_networks:
+#  - 'mediarr'
+
+# Set container ports
+sonarr_docker_ports:
+  - '8989:8989'
+
+# Set container pull policy
+# See: https://docs.docker.com/reference/compose-file/services/#pull_policy
+# Can be: always, never, missing, build, daily, weekly, every_<duration>
+sonarr_docker_pull_policy: 'missing'
+
+# Set container restart policy
+sonarr_docker_restart_policy: 'unless-stopped'
+
+# Set container runtime
+sonarr_docker_runtime: 'runc'
+
+# Set additional container volumes
+sonarr_docker_additional_volumes: []
+# Example:
+# sonarr_docker_additional_volumes:
+# - '/path/to/tv:/tv'
+# - '/path/to/movies:/movies'
+# - '/path/to/music:/music'
+# - '/path/to/usenet:/usenet'
+# - '/path/to/torrents:/torrents'
+
+# User that will own the compose files
+sonarr_docker_user: "{{ ansible_user }}"
+
+# Base path for deployment
+sonarr_docker_base_directory: '/srv/sonarr_docker'
+
+# Control image pruning
+sonarr_docker_prune_images: 'false'
+sonarr_docker_prune_until: '72h'

@@ -2,7 +2,7 @@
 
 - name: Ensure base Sonarr directory exists
   ansible.builtin.file:
-    path: "{{ sonarr_docker_base_dir }}"
+    path: "{{ sonarr_docker_base_directory }}"
     state: 'directory'
     owner: "{{ sonarr_docker_user }}"
     group: "{{ sonarr_docker_user }}"
@@ -11,12 +11,25 @@
 - name: Ensure Sonarr compose file is present
   ansible.builtin.template:
     src: 'compose.yml.j2'
-    dest: "{{ sonarr_docker_base_dir }}/compose.yml"
+    dest: "{{ sonarr_docker_base_directory }}/compose.yml"
     owner: "{{ sonarr_docker_user }}"
     group: "{{ sonarr_docker_user }}"
     mode: '0644'
+    backup: true
+  register: sonarr_docker_compose_template_result
 
-- name: Ensure Sonarr is running
+- name: Ensure Sonarr compose project is deployed
   community.docker.docker_compose_v2:
-    project_src: "{{ sonarr_docker_base_dir }}"
+    project_src: "{{ sonarr_docker_base_directory }}"
     state: 'present'
+    pull: "{{ sonarr_docker_pull_policy }}"
+    recreate: "{{ 'always' if sonarr_docker_compose_template_result.changed else 'auto' }}"
+    remove_orphans: true
+
+- name: Prune unused Docker images
+  community.docker.docker_prune:
+    images: true
+    images_filters:
+      dangling: false
+      until: "{{ sonarr_docker_prune_until | default('72h') }}"
+  when: sonarr_docker_prune_images | default(false)

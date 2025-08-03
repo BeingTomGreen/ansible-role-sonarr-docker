@@ -2,7 +2,7 @@
 
 galaxy_info:
   author: Tom Green
-  description: A simple role for running Sonarr via Docker compose.
+  description: A simple ansible role for running Sonarr via Docker compose using the LinuxServer.io Sonarr image
 
   role_name: sonarr_docker
   namespace: beingtomgreen

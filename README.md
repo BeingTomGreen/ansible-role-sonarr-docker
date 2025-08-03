@@ -1,8 +1,10 @@
 # beingtomgreen.sonarr_docker
 
-A simple role for running Sonarr via Docker compose.
+A simple ansible role for running [Sonarr](https://sonarr.tv/) via Docker compose using the [LinuxServer.io Sonarr image](https://docs.linuxserver.io/images/docker-sonarr).
 
-## Installation & usage
+For additional information on how to best handle your media paths see information on [wiki.servarr.com](https://wiki.servarr.com/docker-guide#consistent-and-well-planned-paths) and [trash-guides.info](https://trash-guides.info/File-and-Folder-Structure/Hardlinks-and-Instant-Moves/).
+
+## Installation
 
 Given that Galaxy seems to have abandoned roles, I suggest referencing this repository directly in your projects `requirements.yml`:
 
@@ -22,7 +24,9 @@ You can then install it alongside your other requirements as normal:
 ansible-galaxy install -r requirements.yml
 ```
 
-Now you're free to use it within your project:
+## Example usage
+
+### Basic usage
 
 ```yaml
 ---
@@ -30,24 +34,83 @@ Now you're free to use it within your project:
 - hosts: sonarr
   become: true
   vars:
-    sonarr_docker_environment:
-      PUID: '6900'
-      PGID: '6900'
-      TZ: 'Europe/London'
+    sonarr_docker_env_puid: 5000
+    sonarr_docker_env_pgid: 5000
 
-    sonarr_docker_volumes:
-      - "{{ sonarr_docker_base_dir }}/config:/config"
-      # The default way
-      - '/path/to/tv-series:/tv'
-      - '/path/to/download-client-downloads:/downloads'
-      # Better, for atomic moves/hard links
-      # See https://wiki.servarr.com/docker-guide#consistent-and-well-planned-paths
-      # See https://trash-guides.info/File-and-Folder-Structure/Hardlinks-and-Instant-Moves/
-      # - '/path/to/data:/data'
+    sonarr_docker_additional_volumes:
+        - '/path/to/tv:/tv'
+        - '/path/to/usenet:/usenet'
+        - '/path/to/torrents:/torrents'
+  roles:
+    - role: beingtomgreen.sonarr_docker
+```
+
+### Want the kitchen sink?
+
+Seriously, take a look at [`defaults/main.yml`](defaults/main.yml), it's obnoxiously commented, just for you.
+
+```yaml
+---
+
+- hosts: sonarr
+  become: true
+  vars:
+    sonarr_docker_cap_add:
+      - CAP_WAKE_ALARM
+      - CAP_AUDIT_CONTROL
+    sonarr_docker_cap_drop:
+      - CAP_CHECKPOINT_RESTORE
+
+    sonarr_docker_container_name: 'sonarr_container'
+
+    sonarr_docker_depends_on:
+      - 'my-little service'
+
+    sonarr_docker_devices:
+      - '/dev/dri:/dev/dri'
+      - '/dev/kfd:/dev/kfd'
+
+    sonarr_docker_env_puid: 5000
+    sonarr_docker_env_pgid: 5000
+
+    sonarr_docker_env_timezone: 'Europe/London'
+
+    sonarr_docker_extra_environment_vars:
+      SOME_OTHER_VAR: 'A_VALUE'
+
+    sonarr_docker_image_tag: '10.10.6'
+
+    sonarr_docker_labels:
+      traefik.enable: 'true'
+      traefik.http.routers.traefik-https.entrypoints: 'https'
+
+    # Network mode
+    sonarr_docker_network_mode: 'service:glutun'
+
+    # Or external networks:
+    sonarr_docker_external_networks:
+      - 'my-little-network'
+
+    # Or the default ports
+    sonarr_docker_ports:
+      - '8989:8989'
+
+    sonarr_docker_pull_policy: 'weekly'
+
+    sonarr_docker_restart_policy: 'always'
+
+    sonarr_docker_additional_volumes:
+      - '/path/to/tv:/tv'
+      - '/path/to/usenet:/usenet'
+      - '/path/to/torrents:/torrents'
+
+    sonarr_docker_base_directory: '/opt/sonarr_docker'
+
+    sonarr_docker_prune_images: 'true'
+    sonarr_docker_prune_until: '24h'
 
   roles:
     - role: beingtomgreen.sonarr_docker
-
 ```
 
 ## Role Variables

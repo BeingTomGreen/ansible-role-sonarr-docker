@@ -3,45 +3,74 @@
 
 services:
   sonarr:
-    image: {{ sonarr_docker_image }}
+    {% if sonarr_docker_cap_add | length > 0 %}
+    cap_add:
+      {% for capability in sonarr_docker_cap_add %}
+      - {{ capability }}
+      {% endfor %}
+    {% endif %}
+    {% if sonarr_docker_cap_drop | length > 0 %}
+    cap_drop:
+      {% for capability in sonarr_docker_cap_drop %}
+      - {{ capability }}
+      {% endfor %}
+    {% endif %}
     container_name: {{ sonarr_docker_container_name }}
-    restart: {{ sonarr_docker_restart_policy }}
-    {% if sonarr_docker_ports | length > 0 %}
-    ports:
-      {% for port in sonarr_docker_ports %}
-      - {{ port }}
-      {% endfor %}
-    {% endif %}
-    {% if sonarr_docker_networks | length > 0 %}
-    networks:
-      {% for net in sonarr_docker_networks %}
-      - {{ net }}
-      {% endfor %}
-    {% endif %}
-    volumes:
-      {% for vol in sonarr_docker_volumes %}
-      - {{ vol }}
-      {% endfor %}
-    environment:
-      {% for key, value in sonarr_docker_environment.items() %}
-      {{ key }}: "{{ value }}"
-      {% endfor %}
-    {% if sonarr_docker_depends_on %}
+    {% if sonarr_docker_depends_on | length > 0 %}
     depends_on:
       {% for dep in sonarr_docker_depends_on %}
       - {{ dep }}
       {% endfor %}
     {% endif %}
-    {% if sonarr_docker_labels %}
-    labels:
-      {% for label in sonarr_docker_labels %}
-      - {{ label }}
+    {% if sonarr_docker_devices %}
+    devices:
+      {% for device in sonarr_docker_devices %}
+      - {{ device }}
       {% endfor %}
     {% endif %}
-{% if sonarr_docker_networks | length > 0 %}
+    environment:
+      PUID: "{{ sonarr_docker_env_puid }}"
+      PGID: "{{ sonarr_docker_env_pgid }}"
+      TZ: "{{ sonarr_docker_env_timezone }}"
+      {% if sonarr_docker_extra_environment_vars | length > 0 %}
+      {% for env, value in sonarr_docker_extra_environment_vars.items() %}
+      {{ env }}: "{{ value }}"
+      {% endfor %}
+      {% endif %}
+    image: {{ sonarr_docker_image }}:{{ sonarr_docker_image_tag }}
+    {% if sonarr_docker_labels | length > 0 %}
+    labels:
+      {% for label, value in sonarr_docker_labels.items() %}
+      {{ label }}: "{{ value }}"
+      {% endfor %}
+    {% endif %}
+    {% if sonarr_docker_external_networks | length > 0 and not (sonarr_docker_network_mode | default('')) %}
+    networks:
+      {% for net in sonarr_docker_external_networks %}
+      - {{ net }}
+      {% endfor %}
+    {% elif sonarr_docker_network_mode %}
+    network_mode: {{ sonarr_docker_network_mode | default('host') }}
+    {% endif %}
+    {% if sonarr_docker_ports | length > 0 and not (sonarr_docker_network_mode | default('')) %}
+    ports:
+      {% for port in sonarr_docker_ports %}
+      - {{ port }}
+      {% endfor %}
+    {% endif %}
+    pull_policy: {{ sonarr_docker_pull_policy }}
+    restart: {{ sonarr_docker_restart_policy }}
+    volumes:
+      - {{ sonarr_docker_base_directory }}/config:/config
+      {% if sonarr_docker_additional_volumes | length > 0 %}
+      {% for vol in sonarr_docker_additional_volumes %}
+      - {{ vol }}
+      {% endfor %}
+      {% endif %}
+{% if sonarr_docker_external_networks | length > 0 and not (sonarr_docker_network_mode | default('')) %}
 
 networks:
-  {% for net in sonarr_docker_networks %}
+  {% for net in sonarr_docker_external_networks %}
   {{ net }}:
     external: true
   {% endfor %}
