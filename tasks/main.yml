@@ -18,14 +18,6 @@
     backup: true
   register: sonarr_docker_compose_template_result
 
-# - name: Ensure Sonarr compose project is deployed
-#   community.docker.docker_compose_v2:
-#     project_src: "{{ sonarr_docker_base_directory }}"
-#     state: 'present'
-#     pull: "{{ sonarr_docker_pull_policy }}"
-#     recreate: "{{ 'always' if sonarr_docker_compose_template_result.changed else 'auto' }}"
-#     remove_orphans: true
-
 - name: Ensure Sonarr compose project is deployed
   community.docker.docker_compose_v2:
     project_src: "{{ sonarr_docker_base_directory }}"
