@@ -18,18 +18,18 @@
     backup: true
   register: sonarr_docker_compose_template_result
 
+# - name: Ensure Sonarr compose project is deployed
+#   community.docker.docker_compose_v2:
+#     project_src: "{{ sonarr_docker_base_directory }}"
+#     state: 'present'
+#     pull: "{{ sonarr_docker_pull_policy }}"
+#     recreate: "{{ 'always' if sonarr_docker_compose_template_result.changed else 'auto' }}"
+#     remove_orphans: true
+
 - name: Ensure Sonarr compose project is deployed
   community.docker.docker_compose_v2:
     project_src: "{{ sonarr_docker_base_directory }}"
     state: 'present'
-    pull: "{{ sonarr_docker_pull_policy }}"
-    recreate: "{{ 'always' if sonarr_docker_compose_template_result.changed else 'auto' }}"
+    pull: "{{ 'always' if sonarr_docker_update_image else sonarr_docker_pull_policy }}"
+    recreate: "{{ 'always' if (sonarr_docker_compose_template_result.changed or sonarr_docker_update_image) else 'auto' }}"
     remove_orphans: true
-
-- name: Prune unused Docker images
-  community.docker.docker_prune:
-    images: true
-    images_filters:
-      dangling: false
-      until: "{{ sonarr_docker_prune_until | default('72h') }}"
-  when: sonarr_docker_prune_images | default(false)

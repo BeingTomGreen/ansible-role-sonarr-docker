@@ -106,8 +106,7 @@ Seriously, take a look at [`defaults/main.yml`](defaults/main.yml), it's obnoxio
 
     sonarr_docker_base_directory: '/opt/sonarr_docker'
 
-    sonarr_docker_prune_images: True
-    sonarr_docker_prune_until: '24h'
+    sonarr_docker_update_image: True
 
   roles:
     - role: beingtomgreen.sonarr_docker
