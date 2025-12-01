@@ -1,76 +1,114 @@
 #jinja2: trim_blocks: True, lstrip_blocks: True
 
-services:
-  sonarr:
-    {% if sonarr_docker_cap_add | length > 0 %}
-    cap_add:
-      {% for capability in sonarr_docker_cap_add %}
-      - {{ capability }}
-      {% endfor %}
-    {% endif %}
-    {% if sonarr_docker_cap_drop | length > 0 %}
-    cap_drop:
-      {% for capability in sonarr_docker_cap_drop %}
-      - {{ capability }}
-      {% endfor %}
-    {% endif %}
-    container_name: {{ sonarr_docker_container_name }}
-    {% if sonarr_docker_depends_on | length > 0 %}
-    depends_on:
-      {% for dep in sonarr_docker_depends_on %}
-      - {{ dep }}
-      {% endfor %}
-    {% endif %}
-    {% if sonarr_docker_devices %}
-    devices:
-      {% for device in sonarr_docker_devices %}
-      - {{ device }}
-      {% endfor %}
-    {% endif %}
-    environment:
-      PUID: "{{ sonarr_docker_env_puid }}"
-      PGID: "{{ sonarr_docker_env_pgid }}"
-      TZ: "{{ sonarr_docker_env_timezone }}"
-      {% if sonarr_docker_extra_environment_vars | length > 0 %}
-      {% for env, value in sonarr_docker_extra_environment_vars.items() %}
-      {{ env }}: "{{ value }}"
-      {% endfor %}
-      {% endif %}
-    image: {{ sonarr_docker_image }}:{{ sonarr_docker_image_tag }}
-    {% if sonarr_docker_labels | length > 0 %}
-    labels:
-      {% for label, value in sonarr_docker_labels.items() %}
-      {{ label }}: "{{ value }}"
-      {% endfor %}
-    {% endif %}
-    {% if sonarr_docker_external_networks | length > 0 and not (sonarr_docker_network_mode | default('')) %}
-    networks:
-      {% for net in sonarr_docker_external_networks %}
-      - {{ net }}
-      {% endfor %}
-    {% elif sonarr_docker_network_mode %}
-    network_mode: {{ sonarr_docker_network_mode | default('host') }}
-    {% endif %}
-    {% if sonarr_docker_ports | length > 0 and not (sonarr_docker_network_mode | default('')) %}
-    ports:
-      {% for port in sonarr_docker_ports %}
-      - {{ port }}
-      {% endfor %}
-    {% endif %}
-    pull_policy: {{ sonarr_docker_pull_policy }}
-    restart: {{ sonarr_docker_restart_policy }}
-    volumes:
-      - {{ sonarr_docker_base_directory }}/config:/config
-      {% if sonarr_docker_additional_volumes | length > 0 %}
-      {% for vol in sonarr_docker_additional_volumes %}
-      - {{ vol }}
-      {% endfor %}
-      {% endif %}
-{% if sonarr_docker_external_networks | length > 0 and not (sonarr_docker_network_mode | default('')) %}
+---
 
+services:
+  {{ sonarr_docker_service_name }}:
+{% if sonarr_docker_cpu_count %}
+    cpu_count: {{ sonarr_docker_cpu_count }}
+{% endif %}
+{% if sonarr_docker_cpu_percentage %}
+    cpu_percent: {{ sonarr_docker_cpu_percentage }}
+{% endif %}
+{% if sonarr_docker_cpu_shares %}
+    cpu_shares: {{ sonarr_docker_cpu_shares }}
+{% endif %}
+{% if sonarr_docker_cpu_period %}
+    cpu_period: {{ sonarr_docker_cpu_period }}
+{% endif %}
+{% if sonarr_docker_cpu_quota %}
+    cpu_quota: {{ sonarr_docker_cpu_quota }}
+{% endif %}
+{% if sonarr_docker_cpu_rt_runtime %}
+    cpu_rt_runtime: {{ sonarr_docker_cpu_rt_runtime }}
+{% endif %}
+{% if sonarr_docker_cpu_rt_period %}
+    cpu_rt_period: {{ sonarr_docker_cpu_rt_period }}
+{% endif %}
+{% if sonarr_docker_cpus %}
+    cpus: {{ sonarr_docker_cpus }}
+{% endif %}
+{% if sonarr_docker_cpuset %}
+    cpuset: {{ sonarr_docker_cpuset }}
+{% endif %}
+{% if sonarr_docker_cap_add %}
+    cap_add:
+{{ sonarr_docker_cap_add | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% endif %}
+{% if sonarr_docker_cap_drop %}
+    cap_drop:
+{{ sonarr_docker_cap_drop | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% endif %}
+{% if sonarr_docker_container_name %}
+    container_name: {{ sonarr_docker_container_name }}
+{% endif %}
+{% if sonarr_docker_devices %}
+    devices:
+{{ sonarr_docker_devices | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% endif %}
+{% if sonarr_docker_dns %}
+    dns: {{ sonarr_docker_dns if sonarr_docker_dns is string else sonarr_docker_dns | to_yaml }}
+{% endif %}
+{% if sonarr_docker_dns_opt %}
+    dns_opt: {{ sonarr_docker_dns_opt if sonarr_docker_dns_opt is string else sonarr_docker_dns_opt | to_yaml }}
+{% endif %}
+{% if sonarr_docker_dns_search %}
+    dns_search: {{ sonarr_docker_dns_search if sonarr_docker_dns_search is string else sonarr_docker_dns_search | to_yaml }}
+{% endif %}
+{% if sonarr_docker_domainname %}
+    domainname: {{ sonarr_docker_domainname }}
+{% endif %}
+    environment:
+{{ sonarr_docker_environment | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% if sonarr_docker_hostname %}
+    hostname: {{ sonarr_docker_hostname }}
+{% endif %}
+    image: {{ sonarr_docker_image }}
+{% if sonarr_docker_labels %}
+    labels:
+{{ sonarr_docker_labels | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% endif %}
+{% if sonarr_docker_mem_limit %}
+    mem_limit: {{ sonarr_docker_mem_limit }}
+{% endif %}
+{% if sonarr_docker_mem_reservation %}
+    mem_reservation: {{ sonarr_docker_mem_reservation }}
+{% endif %}
+{% if sonarr_docker_mem_swappiness %}
+    mem_swappiness: {{ sonarr_docker_mem_swappiness }}
+{% endif %}
+{% if sonarr_docker_memswap_limit %}
+    memswap_limit: {{ sonarr_docker_memswap_limit }}
+{% endif %}
+{% if sonarr_docker_network_mode %}
+    network_mode: {{ sonarr_docker_network_mode }}
+{% endif %}
+{% if sonarr_docker_networks %}
+    networks:
+{{ sonarr_docker_networks | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% endif %}
+{% if sonarr_docker_ports %}
+    ports:
+{{ sonarr_docker_ports | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% endif %}
+{% if sonarr_docker_pull_policy %}
+    pull_policy: {{ sonarr_docker_pull_policy }}
+{% endif %}
+{% if sonarr_docker_restart_policy %}
+    restart: {{ sonarr_docker_restart_policy }}
+{% endif %}
+{% if sonarr_docker_runtime %}
+    runtime: {{ sonarr_docker_runtime }}
+{% endif %}
+{% if sonarr_docker_volumes %}
+    volumes:
+{{ sonarr_docker_volumes | to_nice_yaml(indent=2) | indent(6, first=True) }}
+{% endif %}
+
+{% if sonarr_docker_networks %}
 networks:
-  {% for net in sonarr_docker_external_networks %}
-  {{ net }}:
+{% for network in sonarr_docker_networks %}
+  {{ network }}:
     external: true
-  {% endfor %}
+{% endfor %}
 {% endif %}

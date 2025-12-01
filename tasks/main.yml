@@ -7,6 +7,9 @@
     owner: "{{ sonarr_docker_user }}"
     group: "{{ sonarr_docker_user }}"
     mode: '0755'
+  tags:
+    - sonarr
+    - sonarr_setup
 
 - name: Ensure Sonarr compose file is present
   ansible.builtin.template:
@@ -17,11 +20,16 @@
     mode: '0644'
     backup: true
   register: sonarr_docker_compose_template_result
+  tags:
+    - sonarr
+    - sonarr_config
 
 - name: Ensure Sonarr compose project is deployed
   community.docker.docker_compose_v2:
     project_src: "{{ sonarr_docker_base_directory }}"
     state: 'present'
-    pull: "{{ 'always' if sonarr_docker_update_image else sonarr_docker_pull_policy }}"
-    recreate: "{{ 'always' if (sonarr_docker_compose_template_result.changed or sonarr_docker_update_image) else 'auto' }}"
+    recreate: "{{ 'always' if (sonarr_docker_compose_template_result.changed) else 'auto' }}"
     remove_orphans: true
+  tags:
+    - sonarr
+    - sonarr_deploy
